@@ -1,11 +1,22 @@
+<?php
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/db-test', function () {
+Route::get('/db-check', function () {
     try {
-        DB::connection()->getPdo();
-        return "✅ Database connected: " . DB::connection()->getDatabaseName();
+        $dbName = DB::connection()->getDatabaseName();
+        return response()->json([
+            "status" => "ok",
+            "database" => $dbName,
+            "host" => config('database.connections.mysql.host'),
+            "user" => config('database.connections.mysql.username'),
+            "time" => now()->toDateTimeString()
+        ]);
     } catch (\Exception $e) {
-        return "❌ DB Error: " . $e->getMessage();
+        return response()->json([
+            "status" => "error",
+            "message" => $e->getMessage()
+        ]);
     }
 });
